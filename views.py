@@ -1,6 +1,8 @@
+from mailbox import NotEmptyError
 from flask_jwt_extended import create_access_token, JWTManager,jwt_required
 from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
-from flask import session, request, url_for, jsonify
+from flask import session, request, url_for, jsonify, json
+from flask.views import MethodView
 from authlib.integrations.flask_client import OAuth
 from models import Perfil
 from app import app, db
@@ -22,6 +24,7 @@ github = oauth.register(
     client_kwargs={'scope': 'user:email'},
 )
 
+
 @app.route('/healthcheck')
 def healthcheck():
     return {"status": "OK"}
@@ -40,9 +43,9 @@ def cadastrar():
     senha = json['password']
 
     # Verifica se já existe uma conta com esse email
-    if Perfil.query.filter_by(email=email).first():
+    if Perfil.query.filter_by(username=username).first():
         return {"mensagem": "Esse email já está sendo utilizado!"}, 409
-    elif Perfil.query.filter_by(username=username).first():
+    elif Perfil.query.filter_by(email=email).first():
         return {"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409
     
     # Caso contrário continua as etapas do cadastro
@@ -53,7 +56,7 @@ def cadastrar():
     return {"mensagem": "Cadastro realizado com sucesso!"}, 201
 
 
-# Route to login with Github
+# Rota para login
 @app.route('/login', methods=['POST'])
 def login():
     # Armazena o json na variável
@@ -67,9 +70,9 @@ def login():
 
     if perfil:  # Verifica se um usuário foi encontrado
         token_acesso = create_access_token(perfil.username)
-        return jsonify({"token": token_acesso}, 200)
+        return jsonify({"token": token_acesso, "status": 200})
 
-    return {"mensagem": "Credenciais incorretas!"}, 204
+    return {"mensagem": "Credenciais incorretas!", "status": 204}
 
 
 @app.route("/logout", methods=['POST', 'GET', ])
@@ -94,3 +97,27 @@ def github_authorize():
     return {"token": token}
 
 
+# -------------------------------------------------------------
+
+class PodcastView(MethodView):
+    
+    def post(self):
+        json = request.json
+        
+        duracao = json['duracao']
+        data_postagem = json['data_postagem']
+        participantes = json['participantes']
+        nome = json['nome']
+        descricao = json['descricao']
+        
+        
+        
+@app.route("/perfis/<username>")
+def getProfile(username):
+    results = Perfil.query.filter_by(username=username)
+    if results:
+        for perfil in results:
+            print(perfil.nome)
+        return "Ok"
+    else:
+        return {"erro": "Nenhum usuário encontrado"}, 404
