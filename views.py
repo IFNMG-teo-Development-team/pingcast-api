@@ -44,9 +44,10 @@ def cadastrar():
 
     # Verifica se já existe uma conta com esse email
     if Perfil.query.filter_by(username=username).first():
-        return {"mensagem": "Esse email já está sendo utilizado!"}, 409
-    elif Perfil.query.filter_by(email=email).first():
         return {"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409
+    elif Perfil.query.filter_by(email=email).first():
+        return {"mensagem": "Esse email já está sendo utilizado!"}, 409
+        
     
     # Caso contrário continua as etapas do cadastro
     novo_perfil = Perfil(username=username, data_nascimento=data_nascimento, genero=genero, nome=nome, email=email, senha=senha, tipo_conta='gratuita')
