@@ -12,6 +12,7 @@ jwt = JWTManager(app)
 oauth = OAuth(app)
 api = Api(app)
 
+# Registro de autenticação
 try:
     from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
     github = oauth.register(
@@ -38,21 +39,6 @@ except:
         api_base_url='https://api.github.com/',
         client_kwargs={'scope': 'user:email'},
     )
-
-
-
-# registro de autenticação
-github = oauth.register(
-    name='github',
-    client_id=GITHUB_CLIENT_ID,
-    client_secret=GITHUB_CLIENT_SECRET,
-    access_token_url='https://github.com/login/oauth/access_token',
-    access_token_params=None,
-    authorize_url='https://github.com/login/oauth/authorize',
-    authorize_params=None,
-    api_base_url='https://api.github.com/',
-    client_kwargs={'scope': 'user:email'},
-)
 
 @app.route('/healthcheck')
 def healthcheck():
