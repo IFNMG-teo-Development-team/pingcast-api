@@ -1,5 +1,4 @@
 from flask_jwt_extended import create_access_token, get_jwt_identity, JWTManager,jwt_required
-from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
 from flask import session, request, url_for, jsonify, json, make_response
 from flask.views import MethodView
 from authlib.integrations.flask_client import OAuth
@@ -7,10 +6,40 @@ from models import Perfil
 from app import app, db
 from flask_restful import Api, Resource
 from marshmallow import Schema
+import os.path
 
 jwt = JWTManager(app)
 oauth = OAuth(app)
 api = Api(app)
+
+try:
+    from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
+    github = oauth.register(
+        name='github',
+        client_id=GITHUB_CLIENT_ID,
+        client_secret=GITHUB_CLIENT_SECRET,
+        access_token_url='https://github.com/login/oauth/access_token',
+        access_token_params=None,
+        authorize_url='https://github.com/login/oauth/authorize',
+        authorize_params=None,
+        api_base_url='https://api.github.com/',
+        client_kwargs={'scope': 'user:email'},
+    )
+
+except:
+    github = oauth.register(
+        name='github',
+        client_id= os.environ['GITHUB_CLIENT_ID'],
+        client_secret= os.environ['GITHUB_CLIENT_SECRET'],
+        access_token_url='https://github.com/login/oauth/access_token',
+        access_token_params=None,
+        authorize_url='https://github.com/login/oauth/authorize',
+        authorize_params=None,
+        api_base_url='https://api.github.com/',
+        client_kwargs={'scope': 'user:email'},
+    )
+
+
 
 # registro de autenticação
 github = oauth.register(
