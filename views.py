@@ -58,7 +58,7 @@ def cadastrar():
 
 
 # Rota para login
-@app.route('/login')
+@app.route('/login', methods=["POST", "OPTIONS"])
 def login():
 
     if request.method == "OPTIONS": # CORS preflight
@@ -80,7 +80,9 @@ def login():
             return _corsify_actual_response(jsonify({"token": token_acesso, "status": 200}))
 
         return {"mensagem": "Credenciais incorretas!", "status": 204}
-
+    
+    else:
+        raise RuntimeError("Weird - don't know how to handle method {}".format(request.method))
 
 @app.route("/logout", methods=['POST', 'GET', ])
 @jwt_required()
