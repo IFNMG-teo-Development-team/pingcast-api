@@ -51,7 +51,7 @@ def github_authorize():
 def cadastrar():
     if request.method == "OPTIONS": # CORS preflight
         return _build_cors_preflight_response()
-    else:
+    elif request.method == "GET":
         # Armazena o json na variável
         json = request.json
         # Armazena os dados necessários nas variáveis
@@ -61,7 +61,7 @@ def cadastrar():
         nome = json['name']
         email = json['email']
         senha = json['password']
-
+        
         # Verifica se já existe uma conta com esse email
         if Perfil.query.filter_by(username=username).first():
             return _corsify_actual_response(jsonify({"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409))
@@ -88,14 +88,18 @@ def login():
         senha = json['password']
 
         # Consulta no banco uma ocorrência do email
-        perfil = Perfil.query.filter_by(email=email, senha=senha).first()
+        try:
+            perfil = Perfil.query.filter_by(email=email, senha=senha).first()
+            
+            if perfil:  # Verifica se um usuário foi encontrado
+                token_acesso = create_access_token(perfil.id)
+                return _corsify_actual_response(jsonify({"token": token_acesso, "status": 200}))
 
-        if perfil:  # Verifica se um usuário foi encontrado
-            token_acesso = create_access_token(perfil.id)
-            return _corsify_actual_response(jsonify({"token": token_acesso, "status": 200}))
+            return _corsify_actual_response(jsonify({"mensagem": "Email ou senha incorretos!", "status": 204}))
 
-        return _corsify_actual_response(jsonify({"mensagem": "Email ou senha incorretos!", "status": 204}))
-
+        except:
+            return {"Mensagem":"Houve um problema ao conectar ao banco"}
+      
 # Buscar dados públicos de um perfil pelo id
 @app.route("/perfil/<id>", methods=["GET"])
 @jwt_required()
@@ -103,15 +107,34 @@ def get_perfil(id):
     if request.method == "OPTIONS": # CORS preflight
             return _build_cors_preflight_response()
     elif request.method == "GET":
-        perfil = Perfil.query.filter_by(id=id).first()
-        if perfil:
-            return _corsify_actual_response(jsonify({"perfil" : jsonConverter(PerfilSchema, perfil), "status":200}))
-        else:
-            return _corsify_actual_response(jsonify({"status": 404,
-                    "mensagem": "Perfil não encontrado!"}))
+        try:
+            perfil = Perfil.query.filter_by(id=id).first()
+            if perfil:
+                return _corsify_actual_response(jsonify({"perfil" : jsonConverter(PerfilSchema, perfil), "status":200}))
+            else:
+                return _corsify_actual_response(jsonify({"status": 404,
+                        "mensagem": "Perfil não encontrado!"}))
+        except:
+            return {"Mensagem":"Houve um problema ao conectar ao banco"}
+
+@app.route("/perfil", methods=["GET"])
+@jwt_required()
+def get_perfis():
+    if request.method == "OPTIONS": # CORS preflight
+        return _build_cors_preflight_response()
+    elif request.method == "GET":
+        try:
+            perfil = Perfil.query.all()
+            if perfil:
+                return _corsify_actual_response(jsonify({"perfis" : jsonConverter(PerfilSchema, perfil), "status":200}))
+            else:
+                return _corsify_actual_response(jsonify({
+                    "status": 404,
+                    "mensagem": "Nenhum perfil encontrado!"}))
+        except:
+            return {"Mensagem":"Houve um problema ao conectar ao banco"}    
   
 # [Final] \----------- Perfil -----------\
-
 
          
 # ------ Configurações dos cors ------
