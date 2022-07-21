@@ -1,6 +1,6 @@
 from flask_jwt_extended import create_access_token, JWTManager,jwt_required
 from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
-from flask import session, request, url_for, jsonify, json
+from flask import session, request, url_for, jsonify, json, make_response
 from flask.views import MethodView
 from authlib.integrations.flask_client import OAuth
 from models import Perfil
@@ -58,22 +58,28 @@ def cadastrar():
 
 
 # Rota para login
-@app.route('/login', methods=['POST'])
+@app.route('/login')
 def login():
-    # Armazena o json na variável
-    json = request.json
-    # Armazena os dados necessários nas variáveis
-    email = json['email']
-    senha = json['password']
 
-    # Consulta no banco uma ocorrência do email
-    perfil = Perfil.query.filter_by(email=email, senha=senha).first()
+    if request.method == "OPTIONS": # CORS preflight
+            return _build_cors_preflight_response()
+    elif request.method == "POST":
+        # Armazena o json na variável
+        json = request.json
+        # Armazena os dados necessários nas variáveis
+        email = json['email']
+        senha = json['password']
 
-    if perfil:  # Verifica se um usuário foi encontrado
-        token_acesso = create_access_token(perfil.username)
-        return jsonify({"token": token_acesso, "status": 200})
+        # Consulta no banco uma ocorrência do email
+        perfil = Perfil.query.filter_by(email=email, senha=senha).first()
 
-    return {"mensagem": "Credenciais incorretas!", "status": 204}
+
+
+        if perfil:  # Verifica se um usuário foi encontrado
+            token_acesso = create_access_token(perfil.username)
+            return _corsify_actual_response(jsonify({"token": token_acesso, "status": 200}))
+
+        return {"mensagem": "Credenciais incorretas!", "status": 204}
 
 
 @app.route("/logout", methods=['POST', 'GET', ])
@@ -112,3 +118,13 @@ class PodcastView(MethodView):
         descricao = json['descricao']
         
         
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+
+def _corsify_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response 
