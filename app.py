@@ -11,11 +11,11 @@ if os.path.exists('config.py'):
     from config import SECRET_KEY, SQLALCHEMY_DATABASE_URI
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
-    app.config["JWT_SECRET_KEY"] = SECRET_KEY
 else:
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['SQLALCHEMY_DATABASE_URI']
-    app.config["JWT_SECRET_KEY"] = os.environ['SECRET_KEY']
+
+app.config["JWT_SECRET_KEY"] = SECRET_KEY
 
 db = SQLAlchemy(app)
 
