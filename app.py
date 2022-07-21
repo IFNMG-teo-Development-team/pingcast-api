@@ -7,12 +7,12 @@ app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-if os.path.exists('config.py'):
+try:
     from config import SECRET_KEY, SQLALCHEMY_DATABASE_URI
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
     app.config["JWT_SECRET_KEY"] = SECRET_KEY
-else:
+except:
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['SQLALCHEMY_DATABASE_URI']
     app.config["JWT_SECRET_KEY"] = os.environ['SECRET_KEY']
