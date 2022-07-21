@@ -1,4 +1,3 @@
-from mailbox import NotEmptyError
 from flask_jwt_extended import create_access_token, JWTManager,jwt_required
 from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
 from flask import session, request, url_for, jsonify, json
@@ -6,10 +5,11 @@ from flask.views import MethodView
 from authlib.integrations.flask_client import OAuth
 from models import Perfil
 from app import app, db
-
+from flask_restful import Api, Resource
 
 jwt = JWTManager(app)
 oauth = OAuth(app)
+api = Api(app)
 
 # registro de autenticação
 github = oauth.register(
@@ -83,7 +83,7 @@ def logout():
 
 
 # Route to login with Github
-@app.route('/login/github')
+@app.route('/login/github', methods=['POST', 'GET'])
 def github_login():
     github = oauth.create_client('github')
     redirect_uri = url_for('github_authorize', _external=True)
@@ -112,13 +112,3 @@ class PodcastView(MethodView):
         descricao = json['descricao']
         
         
-        
-@app.route("/perfis/<username>")
-def getProfile(username):
-    results = Perfil.query.filter_by(username=username)
-    if results:
-        for perfil in results:
-            print(perfil.nome)
-        return "Ok"
-    else:
-        return {"erro": "Nenhum usuário encontrado"}, 404
