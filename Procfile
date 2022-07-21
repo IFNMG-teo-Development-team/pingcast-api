@@ -1,2 +1,1 @@
-web:node index.js
-
+gunicorn==20.1.0
