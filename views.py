@@ -12,13 +12,13 @@ jwt = JWTManager(app)
 oauth = OAuth(app)
 api = Api(app)
 
-# Registro de autenticação github e google
+# Registro de autenticação
 try:
-    from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+    from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY
 
     github = oauth.register(
         name='github',
-        client_id= GITHUB_CLIENT_ID,
+        client_id=GITHUB_CLIENT_ID,
         client_secret=GITHUB_CLIENT_SECRET,
         access_token_url='https://github.com/login/oauth/access_token',
         access_token_params=None,
@@ -26,20 +26,6 @@ try:
         authorize_params=None,
         api_base_url='https://api.github.com/',
         client_kwargs={'scope': 'user'},
-    )
-
-    google = oauth.register(
-        name='google',
-        client_id=GOOGLE_CLIENT_ID,
-        client_secret=GOOGLE_CLIENT_SECRET,
-        access_token_url='https://accounts.google.com/o/oauth2/token',
-        access_token_params=None,
-        authorize_url='https://accounts.google.com/o/oauth2/auth',
-        authorize_params=None,
-        api_base_url='https://www.googleapis.com/oauth2/v1/',
-        userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
-        # This is only needed if using openId to fetch user info
-        client_kwargs={'scope': 'openid email profile'},
     )
 
 except:
@@ -53,20 +39,6 @@ except:
         authorize_params=None,
         api_base_url='https://api.github.com/',
         client_kwargs={'scope': 'user:email'},
-    )
-
-    google = oauth.register(
-        name='google',
-        client_id=os.environ["GOOGLE_CLIENT_ID"],
-        client_secret=os.environ["GOOGLE_CLIENT_SECRET"],
-        access_token_url='https://accounts.google.com/o/oauth2/token',
-        access_token_params=None,
-        authorize_url='https://accounts.google.com/o/oauth2/auth',
-        authorize_params=None,
-        api_base_url='https://www.googleapis.com/oauth2/v1/',
-        userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
-        # This is only needed if using openId to fetch user info
-        client_kwargs={'scope': 'openid email profile'},
     )
 
 
@@ -86,49 +58,8 @@ def github_login():
 # Route to login authorization with Github
 @app.route('/login/github/authorize')
 def github_authorize():
-    # token = github.authorize_access_token()
-
+    token = github.authorize_access_token()
     resp = github.get('user').json()
-
-    # Verifica se já está cadastrado
-    if Perfil.query.filter_by(social_id=resp['id']).first():
-        perfil = Perfil.query.filter_by(username=resp['login']).first()
-        token_acesso = create_access_token(perfil.id)
-        return _corsify_actual_response(jsonify({"status": 200,
-                                                 "token": token_acesso,
-                                                 "id": perfil.id,
-                                                 "username": perfil.username}))
-    # Verifica se já existe um usuário com esse username (Isso vai ter um problema para corrigir)
-    elif Perfil.query.filter_by(username=resp['login']).first():
-        return _corsify_actual_response(
-            jsonify({"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409))
-    else:
-        try:
-            # Realiza o cadastro do novo usuário pelo github
-            cadastrar_github(resp)
-            perfil = Perfil.query.filter_by(username=resp['login']).first()
-            token_acesso = create_access_token(perfil.id)
-            return _corsify_actual_response(jsonify({"status": 200,
-                                                     "token": token_acesso,
-                                                     "id": perfil.id,
-                                                     "username": perfil.username}))
-        except:
-            return _corsify_actual_response(jsonify({'Mensagem': 'Erro ao conectar!'}))
-
-
-# Route to login with Google
-@app.route('/login/google', methods=['POST', 'GET'])
-def google_login():
-    google = oauth.create_client('google')
-    redirect_uri = url_for('google_authorize', _external=True)
-    return google.authorize_redirect(redirect_uri)
-
-
-# Route to login authorization with Google
-@app.route('/login/google/authorize')
-def google_authorize():
-    # token = google.authorize_access_token()
-    resp = google.get('user').json()
 
     # Verifica se já está cadastrado
     if Perfil.query.filter_by(social_id=resp['id']).first():
