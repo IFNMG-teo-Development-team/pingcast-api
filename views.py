@@ -84,7 +84,7 @@ def github_authorize():
                                                      "id": perfil.id,
                                                      "username": perfil.username}))
         except:
-            return {'Mensagem': 'Erro ao conectar!'}
+            return _corsify_actual_response(jsonify({'Mensagem': 'Erro ao conectar!'}))
 
 
 # Criar novo perfil github(cadastrar)
