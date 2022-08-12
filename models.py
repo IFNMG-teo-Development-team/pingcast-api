@@ -1,5 +1,6 @@
 from app import db
 
+
 class Perfil(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(45), nullable=True)
@@ -11,6 +12,8 @@ class Perfil(db.Model):
     email = db.Column(db.String(45), nullable=False)
     senha = db.Column(db.String(45), nullable=False)
     tipo_conta = db.Column(db.String(45), nullable=True)
+    social_id = db.Column(db.String(45), nullable=True)
+
 
     def __repr__(self):
         return self.nome
