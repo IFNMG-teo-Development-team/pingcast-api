@@ -116,45 +116,6 @@ def github_authorize():
             return _corsify_actual_response(jsonify({'Mensagem': 'Erro ao conectar!'}))
 
 
-# Route to login with Google
-@app.route('/login/google', methods=['POST', 'GET'])
-def google_login():
-    google = oauth.create_client('google')
-    redirect_uri = url_for('google_authorize', _external=True)
-    return google.authorize_redirect(redirect_uri)
-
-
-# Route to login authorization with Google
-@app.route('/login/google/authorize')
-def google_authorize():
-    # token = google.authorize_access_token()
-    resp = google.get('user').json()
-
-    # Verifica se já está cadastrado
-    if Perfil.query.filter_by(social_id=resp['id']).first():
-        perfil = Perfil.query.filter_by(username=resp['login']).first()
-        token_acesso = create_access_token(perfil.id)
-        return _corsify_actual_response(jsonify({"status": 200,
-                                                 "token": token_acesso,
-                                                 "id": perfil.id,
-                                                 "username": perfil.username}))
-    # Verifica se já existe um usuário com esse username (Isso vai ter um problema para corrigir)
-    elif Perfil.query.filter_by(username=resp['login']).first():
-        return _corsify_actual_response(
-            jsonify({"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409))
-    else:
-        try:
-            # Realiza o cadastro do novo usuário pelo github
-            cadastrar_github(resp)
-            perfil = Perfil.query.filter_by(username=resp['login']).first()
-            token_acesso = create_access_token(perfil.id)
-            return _corsify_actual_response(jsonify({"status": 200,
-                                                     "token": token_acesso,
-                                                     "id": perfil.id,
-                                                     "username": perfil.username}))
-        except:
-            return _corsify_actual_response(jsonify({'Mensagem': 'Erro ao conectar!'}))
-
 
 # Criar novo perfil github(cadastrar)
 def cadastrar_github(json):
