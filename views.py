@@ -52,7 +52,7 @@ def healthcheck():
 def github_login():
     github = oauth.create_client('github')
     redirect_uri = url_for('github_authorize', _external=True)
-    return github.authorize_redirect(redirect_uri)
+    return _corsify_actual_response(github.authorize_redirect(redirect_uri))
 
 
 # Route to login authorization with Github
