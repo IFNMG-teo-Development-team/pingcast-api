@@ -58,9 +58,6 @@ def github_login():
 # Route to login authorization with Github
 @app.route('/login/github/authorize')
 def github_authorize():
-   if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-    else:
         token = github.authorize_access_token()
         resp = github.get('user').json()
 
