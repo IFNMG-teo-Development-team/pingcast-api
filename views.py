@@ -204,9 +204,8 @@ def cadastrar():
 # Realizar login
 @app.route("/api/login", methods=["POST"])
 def login():
-    if request.method == "OPTIONS":  # CORS preflight
-        return _build_cors_preflight_response()
-    elif request.method == "POST":
+
+    if request.method == "POST":
         # Armazena o json na variável
         json = request.json
         # Armazena os dados necessários nas variáveis
