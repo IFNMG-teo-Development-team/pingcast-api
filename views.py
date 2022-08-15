@@ -204,7 +204,6 @@ def cadastrar():
 # Realizar login
 @app.route("/api/login", methods=["POST"])
 def login():
-
     if request.method == "POST":
         # Armazena o json na variável
         json = request.json
@@ -218,10 +217,10 @@ def login():
 
             if perfil:  # Verifica se um usuário foi encontrado
                 token_acesso = create_access_token(perfil.id)
-                return _corsify_actual_response(jsonify({"status": 200,
-                                                         "token": token_acesso,
-                                                         "id": perfil.id,
-                                                         "username": perfil.username}))
+                return jsonify({"status": 200,
+                                "token": token_acesso,
+                                "id": perfil.id,
+                                "username": perfil.username})
 
             return _corsify_actual_response(jsonify({"mensagem": "Email ou senha incorretos!", "status": 204}))
 
