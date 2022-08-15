@@ -58,33 +58,36 @@ def github_login():
 # Route to login authorization with Github
 @app.route('/login/github/authorize')
 def github_authorize():
-    token = github.authorize_access_token()
-    resp = github.get('user').json()
-
-    # Verifica se já está cadastrado
-    if Perfil.query.filter_by(social_id=resp['id']).first():
-        perfil = Perfil.query.filter_by(username=resp['login']).first()
-        token_acesso = create_access_token(perfil.id)
-        return _corsify_actual_response(jsonify({"status": 200,
-                                                 "token": token_acesso,
-                                                 "id": perfil.id,
-                                                 "username": perfil.username}))
-    # Verifica se já existe um usuário com esse username (Isso vai ter um problema para corrigir)
-    elif Perfil.query.filter_by(username=resp['login']).first():
-        return _corsify_actual_response(
-            jsonify({"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409))
+   if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
     else:
-        try:
-            # Realiza o cadastro do novo usuário pelo github
-            cadastrar_github(resp)
+        token = github.authorize_access_token()
+        resp = github.get('user').json()
+
+        # Verifica se já está cadastrado
+        if Perfil.query.filter_by(social_id=resp['id']).first():
             perfil = Perfil.query.filter_by(username=resp['login']).first()
             token_acesso = create_access_token(perfil.id)
             return _corsify_actual_response(jsonify({"status": 200,
                                                      "token": token_acesso,
                                                      "id": perfil.id,
                                                      "username": perfil.username}))
-        except:
-            return {'Mensagem': 'Erro ao conectar!'}
+        # Verifica se já existe um usuário com esse username (Isso vai ter um problema para corrigir)
+        elif Perfil.query.filter_by(username=resp['login']).first():
+            return _corsify_actual_response(
+                jsonify({"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409))
+        else:
+            try:
+                # Realiza o cadastro do novo usuário pelo github
+                cadastrar_github(resp)
+                perfil = Perfil.query.filter_by(username=resp['login']).first()
+                token_acesso = create_access_token(perfil.id)
+                return _corsify_actual_response(jsonify({"status": 200,
+                                                         "token": token_acesso,
+                                                         "id": perfil.id,
+                                                         "username": perfil.username}))
+            except:
+                return {'Mensagem': 'Erro ao conectar!'}
 
 
 # Criar novo perfil github(cadastrar)
