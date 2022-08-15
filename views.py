@@ -50,17 +50,20 @@ def healthcheck():
 # Route to login with Github
 @app.route('/login/github', methods=['POST', 'GET'])
 def github_login():
-    github = oauth.create_client('github')
-    redirect_uri = url_for('github_authorize', _external=True)
-    return _corsify_actual_response(github.authorize_redirect(redirect_uri))
+    if request.method == "OPTIONS":  # CORS preflight
+       return _build_cors_preflight_response()
+    else:
+        github = oauth.create_client('github')
+        redirect_uri = url_for('github_authorize', _external=True)
+        return _corsify_actual_response(github.authorize_redirect(redirect_uri))
 
 
 # Route to login authorization with Github
 @app.route('/login/github/authorize')
 def github_authorize():
-        token = github.authorize_access_token()
-        resp = github.get('user').json()
-
+     if request.method == "OPTIONS":  # CORS preflight
+       return _build_cors_preflight_response()
+    else:   
         # Verifica se já está cadastrado
         if Perfil.query.filter_by(social_id=resp['id']).first():
             perfil = Perfil.query.filter_by(username=resp['login']).first()
