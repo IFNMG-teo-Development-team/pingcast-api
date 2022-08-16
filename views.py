@@ -10,11 +10,12 @@ import os.path
 import secrets
 import bcrypt
 from flask_cors import cross_origin
+from flask_cors import CORS
 
 jwt = JWTManager(app)
 oauth = OAuth(app)
 api = Api(app)
-
+CORS(app)
 # Registro de autenticação github e google
 try:
     from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
