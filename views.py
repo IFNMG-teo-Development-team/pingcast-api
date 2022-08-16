@@ -88,7 +88,34 @@ def github_login():
     else:
         github = oauth.create_client('github')
         redirect_uri = url_for('github_authorize', _external=True)
-        return _corsify_actual_response(github.authorize_redirect('www.google.com.br'))
+        token = github.authorize_access_token()
+
+        resp = github.get('user').json()
+
+        # Verifica se já está cadastrado
+        if Perfil.query.filter_by(social_id=resp['id']).first():
+            perfil = Perfil.query.filter_by(username=resp['login']).first()
+            token_acesso = create_access_token(perfil.id)
+            return _corsify_actual_response(jsonify({"status": 200,
+                                                     "token": token_acesso,
+                                                     "id": perfil.id,
+                                                     "username": perfil.username}))
+        # Verifica se já existe um usuário com esse username (Isso vai ter um problema para corrigir)
+        elif Perfil.query.filter_by(username=resp['login']).first():
+            return _corsify_actual_response(
+                jsonify({"mensagem": "Esse nome de usuário já está sendo utilizado!"}, 409))
+        else:
+            try:
+                # Realiza o cadastro do novo usuário pelo github
+                cadastrar_github(resp)
+                perfil = Perfil.query.filter_by(username=resp['login']).first()
+                token_acesso = create_access_token(perfil.id)
+                return _corsify_actual_response(jsonify({"status": 200,
+                                                         "token": token_acesso,
+                                                         "id": perfil.id,
+                                                         "username": perfil.username}))
+            except:
+                return _corsify_actual_response(jsonify({'Mensagem': 'Erro ao conectar!'}))
 
 
 # Route to login authorization with Github
