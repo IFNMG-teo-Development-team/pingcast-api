@@ -4,6 +4,7 @@ from flask.views import MethodView
 from authlib.integrations.flask_client import OAuth
 from models import Perfil
 from app import app, db
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_restful import Api, Resource
 from serializers import PerfilSerializer
 import os.path
@@ -180,9 +181,7 @@ def cadastrar():
             nome = json['name']
             email = json['email']
             senha = json['password']
-            salt = bcrypt.gensalt()
-
-            senha = bcrypt.hashpw(senha, salt)
+            senha = generate_password_hash(senha, "sha256")
         except Exception as e:
             return _corsify_actual_response(
                 jsonify({"mensagem": "Informeções faltando, verifique os parametros informados!"}, e))
@@ -218,17 +217,21 @@ def login():
         email = json['email']
         senha = json['password']
 
+
         # Consulta no banco uma ocorrência do email
         try:
-            perfil = Perfil.query.filter_by(email=email, senha=senha).first()
+            perfil = Perfil.query.filter_by(email=email).first()
 
             if perfil:  # Verifica se um usuário foi encontrado
-                token_acesso = create_access_token(perfil.id)
-                return _corsify_actual_response(jsonify({"status": 200,
-                                                         "token": token_acesso,
-                                                         "id": perfil.id,
-                                                         "username": perfil.username}))
 
+                if check_password_hash(perfil.senha, senha):
+                    token_acesso = create_access_token(perfil.id)
+                    return _corsify_actual_response(jsonify({"status": 200,
+                                                             "token": token_acesso,
+                                                             "id": perfil.id,
+                                                             "username": perfil.username}))
+
+                return _corsify_actual_response(jsonify({"mensagem": "Email ou senha incorretos!", "status": 204}))
             return _corsify_actual_response(jsonify({"mensagem": "Email ou senha incorretos!", "status": 204}))
 
         except:
