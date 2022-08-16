@@ -88,8 +88,7 @@ def github_login():
     else:
         github = oauth.create_client('github')
         redirect_uri = url_for('github_authorize', _external=True)
-        resp = github.get('user').json()
-        return _corsify_actual_response(jsonify({"dados": resp}))
+        return _corsify_actual_response(github.authorize_redirect(redirect_uri))
 
 
 # Route to login authorization with Github
