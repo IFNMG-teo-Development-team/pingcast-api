@@ -80,19 +80,18 @@ def healthcheck():
 
 
 # Route to login with Github
-@app.route('/login/github', methods=['POST', 'GET'])
+@app.route('/login/github', methods=['POST', 'GET', 'OPTIONS'])
 def github_login():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
     else:
         github = oauth.create_client('github')
-        github.authorize_redirect()
         redirect_uri = url_for('github_authorize', _external=True)
-        return _corsify_actual_response(github.authorize_redirect())
+        return _corsify_actual_response(github.authorize_redirect(redirect_uri))
 
 
 # Route to login authorization with Github
-@app.route('/login/github/authorize')
+@app.route('/login/github/authorize', methods=['GET','POST','OPTIONS'])
 def github_authorize():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
