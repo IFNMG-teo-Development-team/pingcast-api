@@ -15,6 +15,7 @@ from flask_cors import CORS
 jwt = JWTManager(app)
 oauth = OAuth(app)
 api = Api(app)
+CORS(app)
 # Registro de autenticação github e google
 try:
     from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
@@ -82,7 +83,6 @@ def healthcheck():
 
 # Route to login with Github
 @app.route('/login/github', methods=['POST', 'GET', 'OPTIONS'])
-@cross_origin()
 def github_login():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
@@ -94,8 +94,7 @@ def github_login():
 
 # Route to login authorization with Github
 
-@app.route('/login/github/authorize', methods=['GET','POST','OPTIONS'])
-@cross_origin()
+@app.route('/login/github/authorize', methods=['GET', 'POST', 'OPTIONS'])
 def github_authorize():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
@@ -309,8 +308,8 @@ def delete_perfil():
 def _build_cors_preflight_response():
     response = make_response()
     response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add('Access-Control-Allow-Headers', "*")
-    response.headers.add('Access-Control-Allow-Methods', "*")
+    response.headers.add('Access-Control-Allow-Headers', "Origin, Content-Type, X-Auth-Token")
+    response.headers.add('Access-Control-Allow-Methods', "GET, POST, PATCH, PUT, DELETE, OPTIONS")
     return response
 
 
