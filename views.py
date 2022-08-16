@@ -9,7 +9,6 @@ from flask_restful import Api, Resource
 from serializers import PerfilSerializer
 import os.path
 import secrets
-import bcrypt
 from flask_cors import cross_origin
 from flask_cors import CORS
 
@@ -201,8 +200,8 @@ def cadastrar():
             db.session.commit()
 
             return _corsify_actual_response(jsonify({"mensagem": "Cadastro realizado com sucesso!", "status": 201}))
-        except:
-            return _corsify_actual_response(jsonify({"mensagem": "Houve um erro ao conectarmos com o banco de dados"}))
+        except Exception as e:
+            return _corsify_actual_response(jsonify({"mensagem": e}))
 
 
 # Realizar login
