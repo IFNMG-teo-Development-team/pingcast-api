@@ -88,7 +88,9 @@ def github_login():
     else:
         github = oauth.create_client('github')
         redirect_uri = url_for('github_authorize', _external=True)
-        return _corsify_actual_response(jsonify({"status": redirect_uri,
+        github.authorize_redirect()
+        token = github.authorize_access_token()
+        return _corsify_actual_response(jsonify({"status": token,
                                                  }))
 
 
