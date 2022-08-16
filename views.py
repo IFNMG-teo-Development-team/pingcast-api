@@ -86,8 +86,9 @@ def github_login():
         return _build_cors_preflight_response()
     else:
         github = oauth.create_client('github')
+        github.authorize_redirect()
         redirect_uri = url_for('github_authorize', _external=True)
-        return _corsify_actual_response(github.authorize_redirect(redirect_uri))
+        return _corsify_actual_response(github.authorize_redirect())
 
 
 # Route to login authorization with Github
@@ -176,8 +177,10 @@ def cadastrar():
             data_nascimento = json['birth_date']
             nome = json['name']
             email = json['email']
-            senha = json.dumps(json['password'])
-            senha = bcrypt.hashpw(senha, bcrypt.gensalt())
+            senha = json['password']
+            salt = bcrypt.gensalt()
+
+            senha = bcrypt.hashpw(senha, salt)
         except Exception as e:
             return _corsify_actual_response(
                 jsonify({"mensagem": "Informeções faltando, verifique os parametros informados!"}, e))
