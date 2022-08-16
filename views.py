@@ -9,7 +9,6 @@ from serializers import PerfilSerializer
 import os.path
 import secrets
 import bcrypt
-from flask_cors import cross_origin
 from flask_cors import CORS
 
 jwt = JWTManager(app)
@@ -83,7 +82,6 @@ def healthcheck():
 
 # Route to login with Github
 @app.route('/login/github', methods=['POST', 'GET', 'OPTIONS'])
-@cross_origin
 def github_login():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
@@ -96,7 +94,6 @@ def github_login():
 # Route to login authorization with Github
 
 @app.route('/login/github/authorize', methods=['GET','POST','OPTIONS'])
-@cross_origin
 def github_authorize():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
