@@ -14,7 +14,7 @@ from flask_cors import CORS
 jwt = JWTManager(app)
 oauth = OAuth(app)
 api = Api(app)
-cors = CORS(app, resources={r'/*':{'origins':'*'}})
+cors = CORS(app, resources={r'/*': {'origins': '*'}})
 # Registro de autenticação github e google
 try:
     from config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
@@ -88,12 +88,13 @@ def github_login():
     else:
         github = oauth.create_client('github')
         redirect_uri = url_for('github_authorize', _external=True)
-        return _corsify_actual_response(redirect_uri)
+        return _corsify_actual_response(jsonify({"status": redirect_uri,
+                                                 }))
 
 
 # Route to login authorization with Github
 
-@app.route('/login/github/authorize', methods=['GET','POST','OPTIONS'])
+@app.route('/login/github/authorize', methods=['GET', 'POST', 'OPTIONS'])
 def github_authorize():
     if request.method == "OPTIONS":  # CORS preflight
         return _build_cors_preflight_response()
