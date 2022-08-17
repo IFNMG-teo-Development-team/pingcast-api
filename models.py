@@ -9,6 +9,7 @@ class Perfil(db.Model):
     descricao = db.Column(db.String(200), nullable=True)
     genero = db.Column(db.String(45), nullable=True)
     nome = db.Column(db.String(45), nullable=False)
+    sobrenome = db.Column(db.String(45), nullable=False)
     email = db.Column(db.String(45), nullable=False)
     senha = db.Column(db.String(45), nullable=False)
     tipo_conta = db.Column(db.String(45), nullable=True)
