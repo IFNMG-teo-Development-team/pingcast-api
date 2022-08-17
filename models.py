@@ -14,6 +14,5 @@ class Perfil(db.Model):
     tipo_conta = db.Column(db.String(45), nullable=True)
     social_id = db.Column(db.String(45), nullable=True)
 
-
     def __repr__(self):
         return self.nome

@@ -175,11 +175,12 @@ def cadastrar():
         # Armazena os dados necessários nas variáveis
         try:
             username = json['username']
-            genero = json['gender']
-            data_nascimento = json['birth_date']
-            nome = json['name']
+            genero = json['sexo']
+            data_nascimento = json['birth']
+            sobrenome = json['sobrenome']
+            nome = json['nome']
             email = json['email']
-            senha = json['password']
+            senha = json['senha']
             senha = generate_password_hash(senha, "sha256")
         except Exception as e:
             return _corsify_actual_response(
@@ -195,7 +196,7 @@ def cadastrar():
 
             # Caso contrário continua as etapas do cadastro
             novo_perfil = Perfil(username=username, data_nascimento=data_nascimento, genero=genero, nome=nome,
-                                 email=email, senha=senha, tipo_conta='gratuita')
+                                 email=email, senha=senha, tipo_conta='gratuita', sobrenome=sobrenome)
             db.session.add(novo_perfil)
             db.session.commit()
 
@@ -215,7 +216,6 @@ def login():
         # Armazena os dados necessários nas variáveis
         email = json['email']
         senha = json['password']
-
 
         # Consulta no banco uma ocorrência do email
         try:
@@ -310,8 +310,8 @@ def delete_perfil():
 def _build_cors_preflight_response():
     response = make_response()
     response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add('Access-Control-Allow-Headers', "Origin, Content-Type, X-Auth-Token")
-    response.headers.add('Access-Control-Allow-Methods', "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
     return response
 
 
