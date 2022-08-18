@@ -238,7 +238,7 @@ def login():
 
 
 # Buscar dados públicos de um perfil pelo id
-@app.route("/api/perfil/int:<id>", methods=["GET"])
+@app.route("/api/perfil/<int:id>", methods=["GET"])
 @jwt_required()
 def get_perfil(id):
     if request.method == "OPTIONS":  # CORS preflight
