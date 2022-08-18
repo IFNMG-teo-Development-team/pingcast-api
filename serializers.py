@@ -8,6 +8,6 @@ class PerfilSerializer(Schema):
 
 
 # Classes para definição dos campos de retorno de cada tabela
-class PodcastsSerializer(Schema):
+class CanalSerializer(Schema):
     class Meta:
-        fields = ("id", "username", "data_nascimento", "interesses", "descricao", "genero", "nome", "tipo_conta")
+        fields = ("id", "nome", "tema", "bio", "dono")

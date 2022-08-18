@@ -18,14 +18,3 @@ class Perfil(db.Model):
 
     def __repr__(self):
         return self.nome
-
-class Canal(db.Model):
-    __tablename__ = "canal"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome = db.Column(db.String(45), nullable=False)
-    tema = db.Column(db.String(45), nullable=True)
-    bio = db.Column(db.String(200), nullable=True)
-    perfil_id = db.Column(db.Integer, db.ForeignKey("perfil.id"))
-    perfil = db.relationship(Perfil, backref = db.backref("canal", cascade="all, delete_orphan"))
-    def __repr__(self):
-        return self.nome
