@@ -157,7 +157,7 @@ def cadastrar_github(json):
 
     # Etapas do cadastro
     novo_perfil = Perfil(username=username, nome=nome,
-                         email=email, senha=senha, tipo_conta=0, social_id=social_id)
+                         email=email, senha=senha, tipo_conta="0", social_id=social_id)
     db.session.add(novo_perfil)
     db.session.commit()
 
@@ -196,7 +196,7 @@ def cadastrar():
 
             # Caso contrário continua as etapas do cadastro
             novo_perfil = Perfil(username=username, data_nascimento=data_nascimento, genero=genero, nome=nome,
-                                 email=email, senha=senha, tipo_conta=0, sobrenome=sobrenome)
+                                 email=email, senha=senha, tipo_conta="0", sobrenome=sobrenome)
             db.session.add(novo_perfil)
             db.session.commit()
 
@@ -226,9 +226,9 @@ def login():
                 if check_password_hash(perfil.senha, senha):
                     token_acesso = create_access_token(perfil.id)
                     return _corsify_actual_response(jsonify(status=200,
-                                                             token=token_acesso,
-                                                             id=perfil.id,
-                                                             username=perfil.username))
+                                                            token=token_acesso,
+                                                            id=perfil.id,
+                                                            username=perfil.username))
 
                 return _corsify_actual_response(jsonify(msg="Email ou senha incorretos!", status=204))
             return _corsify_actual_response(jsonify(msg="Email ou senha incorretos!", status=204))
@@ -277,46 +277,52 @@ def get_perfis():
             return _corsify_actual_response(jsonify(msg="Nenhum perfil encontrado!", status=404))
 
     # Realiza deleção do perfil logado
-    @app.route("/api/perfil/<int:id>", methods=["DELETE"])
-    @jwt_required()
-    def delete_perfil(id):
-        if request.method == "OPTIONS":  # CORS preflight
-            return _build_cors_preflight_response()
-        elif request.method == "DELETE":
-            try:
-                id_token = get_jwt_identity()
-                if id == id_token:
-                    try:
-                        perfil = Perfil.query.filter_by(id=id_token).first()
-                        db.session.delete(perfil)
-                        db.session.commit()
-                        return _corsify_actual_response(
-                            jsonify(msg="Perfil deletado com sucesso", status=200))
-                    except:
-                        return _corsify_actual_response(jsonify(msg="Houve um problema ao deletar o perfil!", status=200))
-                else:
-                    return _corsify_actual_response(jsonify(msg="Você não tem permissão para isso!", status=403))
-            except:
-                return _corsify_actual_response(jsonify(msg="Houve um problema ao conectar ao banco", status=500))
 
-    # [Final] \----------- Perfil -----------\
 
-    # ------ Configurações dos cors ------
-    def _build_cors_preflight_response():
-        response = make_response()
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add('Access-Control-Allow-Headers', "*")
-        response.headers.add('Access-Control-Allow-Methods', "*")
-        return response
+@app.route("/api/perfil/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_perfil(id):
+    if request.method == "OPTIONS":  # CORS preflight
+        return _build_cors_preflight_response()
+    elif request.method == "DELETE":
+        try:
+            id_token = get_jwt_identity()
+            if id == id_token:
+                try:
+                    perfil = Perfil.query.filter_by(id=id_token).first()
+                    db.session.delete(perfil)
+                    db.session.commit()
+                    return _corsify_actual_response(
+                        jsonify(msg="Perfil deletado com sucesso", status=200))
+                except:
+                    return _corsify_actual_response(
+                        jsonify(msg="Houve um problema ao deletar o perfil!", status=200))
+            else:
+                return _corsify_actual_response(jsonify(msg="Você não tem permissão para isso!", status=403))
+        except:
+            return _corsify_actual_response(jsonify(msg="Houve um problema ao conectar ao banco", status=500))
 
-    def _corsify_actual_response(response):
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
 
-    # ------------------------------------------------------------
+# [Final] \----------- Perfil -----------\
 
-    # Função que converte objeto da query em JSON
-    def jsonConverter(schemaClass: object, toConvertObject: object):
-        consulta = schemaClass()
-        result = consulta.dump(toConvertObject)
-        return result
+# ------ Configurações dos cors ------
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+
+
+def _corsify_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+
+# ------------------------------------------------------------
+
+# Função que converte objeto da query em JSON
+def jsonConverter(schemaClass: object, toConvertObject: object):
+    consulta = schemaClass()
+    result = consulta.dump(toConvertObject)
+    return result
