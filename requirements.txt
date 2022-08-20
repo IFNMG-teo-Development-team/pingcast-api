@@ -30,3 +30,4 @@ SQLAlchemy==1.4.39
 urllib3==1.26.10
 Werkzeug==2.1.2
 bcrypt==3.2.2
+flask_restx==0.5.1

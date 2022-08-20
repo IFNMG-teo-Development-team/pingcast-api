@@ -1,25 +1,33 @@
-from flask import Flask
+from flask import Flask, request, json, jsonify
+from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-import os.path
+from flask_restx import Resource, Api
+from flask_cors import CORS
 
+# Instâncias para a aplicação, documentação e CORS
 app = Flask(__name__)
+api = Api(app,default_swagger_filename="PINGCAST", default="Pingcast-API", default_label="Rotas disponíveis")
+JWTManager(app)
+CORS(app)
+
+#app.config.SWAGGER_UI_OPERATION_ID = True
+#app.config.SWAGGER_UI_REQUEST_DURATION = True
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-try:
-    from config import SECRET_KEY, SQLALCHEMY_DATABASE_URI
+from configHeroku import *
 
-    app.config['SECRET_KEY'] = SECRET_KEY
-    app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
-    app.config["JWT_SECRET_KEY"] = SECRET_KEY
+try:
+    heroku()
 except:
-    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['SQLALCHEMY_DATABASE_URI']
-    app.config["JWT_SECRET_KEY"] = os.environ['SECRET_KEY']
+    local()
 
 db = SQLAlchemy(app)
 
-from views import *
+from Controller.PerfilController import Perfil
+from Controller.AuthController import Auth
+from Controller.CanalController import Canal
+from Controller.PodcastController import Podcast
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

@@ -1,5 +1,5 @@
 from app import db
-
+from sqlalchemy.orm import relationship
 
 class Perfil(db.Model):
     __tablename__ = "perfil"
@@ -15,6 +15,8 @@ class Perfil(db.Model):
     senha = db.Column(db.String(45), nullable=False)
     tipo_conta = db.Column(db.String(45), nullable=True)
     social_id = db.Column(db.String(45), nullable=True)
+    canal = relationship('Canal')
 
     def __repr__(self):
         return self.nome
+
