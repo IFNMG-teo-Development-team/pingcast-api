@@ -10,7 +10,7 @@ class Auth(Resource):
         json = request.json
         # Armazena os dados necessários nas variáveis
         email = json['email']
-        senha = json['senha']
+        senha = json['password']
         return login(email=email, senha=senha)
 
 api.add_resource(Auth, "/api/login")
