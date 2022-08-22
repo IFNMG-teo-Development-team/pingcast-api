@@ -1,6 +1,10 @@
 from app import db
+from sqlalchemy.orm import declarative_base, relationship
 
-class Podcast(db.Model):
+Base = declarative_base()
+
+
+class Podcast(db.Model, Base):
     __tablename__ = "podcast"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     duracao = db.Column(db.Time, nullable=False)
@@ -9,9 +13,7 @@ class Podcast(db.Model):
     descricao = db.Column(db.String(45), nullable=False)
     nome = db.Column(db.String(45), nullable=False)
     post_podcast = db.Column(db.Integer, db.ForeignKey("canal.id"))
-    canal = db.relationship('Canal')
+    canal = relationship('Canal', passive_deletes=True)
 
     def __repr__(self):
         return self.nome
-
-

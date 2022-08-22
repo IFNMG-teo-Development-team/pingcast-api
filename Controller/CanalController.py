@@ -1,7 +1,8 @@
 from app import api, Resource, request, json
+from flask_jwt_extended import jwt_required
 from Services.CanalServices import *
 
-
+@jwt_required()
 @api.route("/api/perfil/<int:id>/canal")
 class Canal(Resource):
     @classmethod
@@ -18,7 +19,7 @@ class Canal(Resource):
     def delete(cls, id):
         return deleteCanal(id)
 
-
+@jwt_required()
 @api.route("/api/canal")
 class Canal(Resource):
     @classmethod

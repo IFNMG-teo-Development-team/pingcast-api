@@ -1,8 +1,8 @@
 from app import api, Resource, request, json, jsonify
 from Services.AuthServices import login
 
-# Realizar login
 
+# Realizar login
 @api.route('/api/login')
 class Auth(Resource):
     def post(self):
@@ -12,5 +12,3 @@ class Auth(Resource):
         email = json['email']
         senha = json['password']
         return login(email=email, senha=senha)
-
-api.add_resource(Auth, "/api/login")

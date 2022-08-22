@@ -10,11 +10,10 @@ class PerfilController(Resource):
     def get(cls):
         return getPerfis()
 
-
     @classmethod
     def post(cls):
         perfil = json.loads(request.data)
-        addPerfil(perfil)
+        return addPerfil(perfil)
 
 
 @jwt_required()

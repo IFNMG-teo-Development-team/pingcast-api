@@ -3,12 +3,9 @@ from Models.PerfilModel import Perfil, db
 from flask_restx import fields, marshal_with
 from flask import abort
 
-
 from Models.PodcastModel import Podcast
 from Services.AuthServices import login
 from Models.CanalModel import Canal
-
-
 
 # Campos para serialização dos dados
 resource_fields = {
@@ -48,14 +45,13 @@ def addPerfil(perfil):
         return abort(409, "E-mail is already in use")
     else:
         try:
-            novo_perfil = Perfil(username=perfil['username'], genero=perfil["sexo"],
-                                 data_nascimento=perfil["birth"],
+            novo_perfil = Perfil(username=perfil['username'], genero=perfil["sexo"], data_nascimento=perfil["birth"],
                                  sobrenome=perfil["sobrenome"], nome=perfil["nome"], email=perfil["email"],
                                  senha=newpassword, tipo_conta="0")
             db.session.add(novo_perfil)
             db.session.commit()
 
-            login(email=perfil['email'], senha=perfil['senha'])
+            return login(email=perfil['email'], senha=perfil['senha'])
         except:
             return abort(500, "There was an error during registration")
 
@@ -63,15 +59,8 @@ def addPerfil(perfil):
 def deletePerfil(id_perfil):
     try:
         perfil = Perfil.query.filter_by(id=id_perfil).first()
-        if perfil:
-            canal = Canal.query.filter_by(dono=id_perfil).first()
-            if canal:
-                Podcast.query.filter_by(post_podcast=canal.id).delete()
-                db.session.delete(canal)
-                db.session.commit()
-            db.session.delete(perfil)
-            db.session.commit()
-        else:
-            return abort(404)
+        db.session.delete(perfil)
+        db.session.commit()
+
     except:
         return abort(500)

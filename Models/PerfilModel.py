@@ -1,7 +1,10 @@
 from app import db
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 
-class Perfil(db.Model):
+Base = declarative_base()
+
+
+class Perfil(db.Model, Base):
     __tablename__ = "perfil"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(45), nullable=True)
@@ -15,8 +18,7 @@ class Perfil(db.Model):
     senha = db.Column(db.String(45), nullable=False)
     tipo_conta = db.Column(db.String(45), nullable=True)
     social_id = db.Column(db.String(45), nullable=True)
-    canal = relationship('Canal')
+    canal = relationship('Canal', back_populates="perfil", cascade="all, delete-orphan")
 
     def __repr__(self):
         return self.nome
-
