@@ -16,14 +16,16 @@ class PerfilController(Resource):
         return addPerfil(perfil)
 
 
-@jwt_required()
+
 @api.route('/api/perfil/<int:id>')
 class PerfilController(Resource):
     @classmethod
+    @jwt_required()
     def get(cls, id):
         return getPerfilById(id)
 
     @classmethod
+    @jwt_required()
     def delete(cls, id):
         deletePerfil(id)
         return {"message": "Profile was successfully deleted"}
