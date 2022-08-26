@@ -15,8 +15,6 @@ resource_fields = {
     "nome": fields.String,
     "descricao": fields.String,
     "post_podcast": fields.Integer,
-    "url": fields.String,
-
 }
 
 

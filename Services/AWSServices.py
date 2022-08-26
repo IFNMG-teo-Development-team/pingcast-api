@@ -1,7 +1,4 @@
 from app import s3, s3_client
-import boto3
-
-# s3.Bucket("pingcast").download_file('teste.png')
 
 def setFileBucket(file, perfil, podcast):
     s3.Bucket('pingcast').put_object(Key=f"{perfil}_{podcast}.mp3", Body=file)
@@ -18,7 +15,6 @@ def getFileBucket(key):
         },
         ExpiresIn=600
     )
-
     return url
 
 
