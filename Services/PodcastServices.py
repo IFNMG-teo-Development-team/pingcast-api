@@ -40,55 +40,59 @@ def getPodcastByIds(id_podcast, id_perfil):
                 "url": link,
             }
 
-    @marshal_with(resource_fields)
-    def getAllPodcasts():
-        podcasts = Podcast.query.all()
-        return podcasts
 
-    def deletePodcast(id_podcast, id_perfil):
-        perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
-        if perfil:
-            canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
-            if canal:
-                podcast = Podcast.query.filter_by(id=id_podcast, post_podcast=canal.id).first_or_404()
-                if podcast:
-                    db.session.delete(podcast)
-                    db.session.commit()
+@marshal_with(resource_fields)
+def getAllPodcasts():
+    podcasts = Podcast.query.all()
+    return podcasts
 
-                    deleteFileBucket(f'{perfil.id}_{podcast.id}.mp3')
 
-                    return {"message": "The podcast was successfully deleted"}, 201
+def deletePodcast(id_podcast, id_perfil):
+    perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
+    if perfil:
+        canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
+        if canal:
+            podcast = Podcast.query.filter_by(id=id_podcast, post_podcast=canal.id).first_or_404()
+            if podcast:
+                db.session.delete(podcast)
+                db.session.commit()
 
-    def addPodcast(podcast, id_perfil, file):
-        perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
-        if perfil:
-            canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
-            if canal:
-                try:
-                    novo_podcast = Podcast(nome=podcast['nome'], descricao=podcast['descricao'],
-                                           duracao=podcast['duracao'],
-                                           participantes=podcast['participantes'],
-                                           data_postagem=podcast['data_postagem'],
-                                           post_podcast=canal.id)
-                    db.session.add(novo_podcast)
-                    db.session.commit()
-                    # filename = Path(f'{perfil.id}_{novo_podcast.id}.mp3')
+                deleteFileBucket(f'{perfil.id}_{podcast.id}.mp3')
 
-                    # filename.write_bytes(file)
-                    setFileBucket(file, perfil.id, novo_podcast.id)
+                return {"message": "The podcast was successfully deleted"}, 201
 
-                    return {"msg": "Podcast was created successfully"}, 201
-                except:
-                    return abort(500, "There was an error when creating the podcast")
 
-        else:
-            return abort(404, "Profile not found")
+def addPodcast(podcast, id_perfil, file):
+    perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
+    if perfil:
+        canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
+        if canal:
+            try:
+                novo_podcast = Podcast(nome=podcast['nome'], descricao=podcast['descricao'],
+                                       duracao=podcast['duracao'],
+                                       participantes=podcast['participantes'],
+                                       data_postagem=podcast['data_postagem'],
+                                       post_podcast=canal.id)
+                db.session.add(novo_podcast)
+                db.session.commit()
+                # filename = Path(f'{perfil.id}_{novo_podcast.id}.mp3')
 
-    @marshal_with(resource_fields)
-    def getCanalPodcastById(id_perfil):
-        perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
-        if perfil:
-            canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
-            if canal:
-                podcasts = Podcast.query.filter_by(post_podcast=canal.id).all()
-                return podcasts
+                # filename.write_bytes(file)
+                setFileBucket(file, perfil.id, novo_podcast.id)
+
+                return {"msg": "Podcast was created successfully"}, 201
+            except:
+                return abort(500, "There was an error when creating the podcast")
+
+    else:
+        return abort(404, "Profile not found")
+
+
+@marshal_with(resource_fields)
+def getCanalPodcastById(id_perfil):
+    perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
+    if perfil:
+        canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
+        if canal:
+            podcasts = Podcast.query.filter_by(post_podcast=canal.id).all()
+            return podcasts
