@@ -97,6 +97,7 @@ def addPodcast(descricao, nome, participantes, id_perfil, file):
         db.session.commit()
         # filename = Path(f'{perfil.id}_{novo_podcast.id}.mp3')
 
+
         # filename.write_bytes(file)
         setFileBucket(file, perfil.id, novo_podcast.id)
 

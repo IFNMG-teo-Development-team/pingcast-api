@@ -3,6 +3,7 @@ from Services.PodcastServices import *
 from flask_jwt_extended import jwt_required
 
 
+
 @api.route("/api/perfil/<int:id_perfil>/canal/podcast/<int:id_podcast>")
 class Canal(Resource):
     @classmethod

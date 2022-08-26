@@ -13,7 +13,6 @@ resource_fields = {
     "dono": fields.Integer,
 }
 
-
 @marshal_with(resource_fields)
 def getCanalByIdPerfil(id_perfil):
     canal = Canal.query.filter_by(dono=id_perfil).first_or_404()

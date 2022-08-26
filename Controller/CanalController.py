@@ -24,7 +24,6 @@ class Canal(Resource):
     @classmethod
     def delete(cls, id):
         return deleteCanal(id)
-
 @api.route("/api/canal")
 class Canal(Resource):
     @classmethod

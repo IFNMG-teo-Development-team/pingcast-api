@@ -3,7 +3,6 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
-
 class Podcast(db.Model, Base):
     __tablename__ = "podcast"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
