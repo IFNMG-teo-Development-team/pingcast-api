@@ -33,11 +33,10 @@ class Canal(Resource):
     @jwt_required()
     def post(cls, id_perfil):
         descricao = request.form.get('descricao')
-        duracao = request.form.get('duracao')
         nome = request.form.get('nome')
         participantes = request.form.get('participantes')
         audio = request.files["audio"].read()
-        return addPodcast(descricao, duracao, nome,participantes, id_perfil, audio)
+        return addPodcast(descricao, nome,participantes, id_perfil, audio)
 
 
 @api.route("/api/podcast")
@@ -46,3 +45,10 @@ class Canal(Resource):
     @jwt_required()
     def get(cls):
         return getAllPodcasts()
+
+@api.route("/api/podcast/<int:id>")
+class Canal(Resource):
+    @classmethod
+    @jwt_required()
+    def get(cls, id):
+        return getPodcast(id)

@@ -40,6 +40,28 @@ def getPodcastByIds(id_podcast, id_perfil):
             }
 
 
+def getPodcast(id):
+    podcast = Podcast.query.filter_by(id=id).first_or_404()
+
+    canal = Canal.query.filter_by(id=podcast.post_podcast).first_or_404()
+
+    perfil = Perfil.query.filter_by(id=canal.dono).first_or_404()
+
+    nome = f"{perfil.id}_{id}.mp3"
+    link = getFileBucket(nome)
+
+    return {
+        "id": podcast.id,
+        "duracao": podcast.duracao,
+        "data_postagem": podcast.data_postagem,
+        "participantes": podcast.participantes,
+        "nome": podcast.nome,
+        "descricao": podcast.descricao,
+        "post_podcast": podcast.post_podcast,
+        "url": link
+    }
+
+
 @marshal_with(resource_fields)
 def getAllPodcasts():
     podcasts = Podcast.query.all()
@@ -61,12 +83,11 @@ def deletePodcast(id_podcast, id_perfil):
                 return {"message": "The podcast was successfully deleted"}, 201
 
 
-def addPodcast(descricao, duracao, nome,participantes, id_perfil, file):
+def addPodcast(descricao, nome, participantes, id_perfil, file):
     perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
     canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
     try:
         novo_podcast = Podcast(nome=nome, descricao=descricao,
-                               duracao=duracao,
                                participantes=participantes,
                                data_postagem=datetime.today().strftime('%Y-%m-%d'),
                                post_podcast=canal.id)
