@@ -3,9 +3,7 @@ from Models.PerfilModel import Perfil, db
 from flask_restx import fields, marshal_with
 from flask import abort
 
-from Models.PodcastModel import Podcast
 from Services.AuthServices import login
-from Models.CanalModel import Canal
 
 # Campos para serialização dos dados
 resource_fields = {
@@ -61,6 +59,5 @@ def deletePerfil(id_perfil):
         perfil = Perfil.query.filter_by(id=id_perfil).first()
         db.session.delete(perfil)
         db.session.commit()
-
     except:
         return abort(500)

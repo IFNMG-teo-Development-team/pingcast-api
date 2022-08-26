@@ -15,8 +15,6 @@ class PerfilController(Resource):
         perfil = json.loads(request.data)
         return addPerfil(perfil)
 
-
-
 @api.route('/api/perfil/<int:id>')
 class PerfilController(Resource):
     @classmethod
@@ -29,3 +27,4 @@ class PerfilController(Resource):
     def delete(cls, id):
         deletePerfil(id)
         return {"message": "Profile was successfully deleted"}
+

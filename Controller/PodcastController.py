@@ -16,7 +16,6 @@ class Canal(Resource):
         return deletePodcast(id_podcast, id_perfil)
 
 
-
 @api.route("/api/perfil/<int:id_perfil>/canal/podcast")
 class Canal(Resource):
     @classmethod
@@ -27,8 +26,9 @@ class Canal(Resource):
     @classmethod
     @jwt_required()
     def post(cls, id_perfil):
-        podcast = json.loads(request.data)
-        return addPodcast(podcast, id_perfil)
+        podcast = json.loads(request.form.get('info'))
+        audio = request.files["audio"].read()
+        return addPodcast(podcast, id_perfil, audio)
 
 
 @api.route("/api/podcast")
