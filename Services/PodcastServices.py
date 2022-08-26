@@ -16,6 +16,7 @@ resource_fields = {
     "nome": fields.String,
     "descricao": fields.String,
     "post_podcast": fields.Integer,
+    "url": fields.String,
 }
 
 
@@ -40,6 +41,7 @@ def getPodcastByIds(id_podcast, id_perfil):
             }
 
 
+@marshal_with(resource_fields)
 def getPodcast(id):
     podcast = Podcast.query.filter_by(id=id).first_or_404()
 
@@ -47,7 +49,7 @@ def getPodcast(id):
 
     perfil = Perfil.query.filter_by(id=canal.dono).first_or_404()
 
-    nome = f"{perfil.id}_{id}.mp3"
+    nome = f"{perfil.id}_{podcast.id}.mp3"
     link = getFileBucket(nome)
 
     return {
@@ -58,7 +60,7 @@ def getPodcast(id):
         "nome": podcast.nome,
         "descricao": podcast.descricao,
         "post_podcast": podcast.post_podcast,
-        "url": link
+        "url": link,
     }
 
 
