@@ -6,6 +6,7 @@ from Models.CanalModel import Canal
 from Services.AWSServices import *
 from app import db
 from datetime import datetime
+from mutagen.mp3 import MP3
 
 # Campos para serialização dos dados
 resource_fields = {
@@ -18,7 +19,6 @@ resource_fields = {
     "post_podcast": fields.Integer,
     "url": fields.String,
 }
-
 
 @marshal_with(resource_fields)
 def getPodcastByIds(id_podcast, id_perfil):
@@ -88,8 +88,12 @@ def deletePodcast(id_podcast, id_perfil):
 def addPodcast(descricao, nome, participantes, id_perfil, file):
     perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
     canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
+
+    audio = MP3(file)
+    tamanho = audio.info.length
     try:
         novo_podcast = Podcast(nome=nome, descricao=descricao,
+                               duracao=tamanho,
                                participantes=participantes,
                                data_postagem=datetime.today().strftime('%Y-%m-%d'),
                                post_podcast=canal.id)
@@ -98,7 +102,7 @@ def addPodcast(descricao, nome, participantes, id_perfil, file):
         # filename = Path(f'{perfil.id}_{novo_podcast.id}.mp3')
 
         # filename.write_bytes(file)
-        setFileBucket(file, perfil.id, novo_podcast.id)
+        #setFileBucket(file, perfil.id, novo_podcast.id)
 
         return {"message": "Podcast was created successfully"}, 201
     except:
