@@ -61,13 +61,13 @@ def deletePodcast(id_podcast, id_perfil):
                 return {"message": "The podcast was successfully deleted"}, 201
 
 
-def addPodcast(podcast, id_perfil, file):
+def addPodcast(descricao, duracao, nome,participantes, id_perfil, file):
     perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
     canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
     try:
-        novo_podcast = Podcast(nome=podcast['nome'], descricao=podcast['descricao'],
-                               duracao=podcast['duracao'],
-                               participantes=podcast['participantes'],
+        novo_podcast = Podcast(nome=nome, descricao=descricao,
+                               duracao=duracao,
+                               participantes=participantes,
                                data_postagem=datetime.today().strftime('%Y-%m-%d'),
                                post_podcast=canal.id)
         db.session.add(novo_podcast)

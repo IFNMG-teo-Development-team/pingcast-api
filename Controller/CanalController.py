@@ -15,6 +15,11 @@ class Canal(Resource):
         canal = json.loads(request.data)
         return addCanal(canal, id)
 
+    @classmethod
+    @jwt_required()
+    def put(cls, id):
+        canal = json.loads(request.data)
+        return editCanal(canal, id)
 
     @classmethod
     def delete(cls, id):

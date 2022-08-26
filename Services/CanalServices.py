@@ -51,6 +51,20 @@ def deleteCanal(id_perfil):
         return abort(500)
 
 
+def editCanal(canal_dados, id_perfil):
+    perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
+    canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
+    try:
+        canal.nome = canal_dados['nome']
+        canal.bio = canal_dados['bio']
+        canal.tema = canal_dados['tema']
+        db.session.add(canal)
+        db.session.commit()
+        return {"message": "The channel was successfully edited"}, 201
+    except:
+        return abort(500, "There was an error when editing the channel")
+
+
 @marshal_with(resource_fields)
 def getCanais():
     canal = Canal.query.all()
