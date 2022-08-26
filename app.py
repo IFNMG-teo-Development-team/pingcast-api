@@ -10,7 +10,19 @@ import os
 import config
 
 try:
+    s3 = boto3.resource('s3',
+                        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                        aws_secret_access_key=os.environ['AWS_SECRECT_ACCESS_KEY'],
+                        region_name="sa-east-1",
+                        )
     # Let's use Amazon S3
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                             aws_secret_access_key=os.environ['AWS_SECRECT_ACCESS_KEY'],
+                             region_name="sa-east-1",
+                             )
+
+except:
     s3 = boto3.resource('s3',
                         aws_access_key_id=config.AWS_ACCESS_KEY_ID,
                         aws_secret_access_key=config.AWS_SECRECT_ACCESS_KEY,
@@ -23,19 +35,7 @@ try:
                              aws_secret_access_key=config.AWS_SECRECT_ACCESS_KEY,
                              region_name="sa-east-1",
                              )
-except:
-    # Let's use Amazon S3
-    s3 = boto3.resource('s3',
-                        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-                        aws_secret_access_key=os.environ['AWS_SECRECT_ACCESS_KEY'],
-                        region_name="sa-east-1",
-                        )
-    # Let's use Amazon S3
-    s3_client = boto3.client('s3',
-                             aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-                             aws_secret_access_key=os.environ['AWS_SECRECT_ACCESS_KEY'],
-                             region_name="sa-east-1",
-                             )
+
 # Instâncias para a aplicação, documentação e CORS
 app = Flask(__name__)
 api = Api(app, default_swagger_filename="PINGCAST", default="Pingcast-API", default_label="Rotas disponíveis")
