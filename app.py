@@ -7,7 +7,7 @@ import boto3
 import datetime
 import os
 
-import config
+
 
 try:
     s3 = boto3.resource('s3',
@@ -23,6 +23,8 @@ try:
                              )
 
 except:
+    import config
+
     s3 = boto3.resource('s3',
                         aws_access_key_id=config.AWS_ACCESS_KEY_ID,
                         aws_secret_access_key=config.AWS_SECRECT_ACCESS_KEY,
