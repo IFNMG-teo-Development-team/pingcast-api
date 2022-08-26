@@ -15,6 +15,12 @@ class Canal(Resource):
     def delete(cls, id_perfil, id_podcast):
         return deletePodcast(id_podcast, id_perfil)
 
+    @classmethod
+    @jwt_required()
+    def put(cls, id_perfil, id_podcast):
+        podcast = json.loads(request.data)
+        return editPodcast(id_podcast, id_perfil, podcast)
+
 
 @api.route("/api/perfil/<int:id_perfil>/canal/podcast")
 class Canal(Resource):

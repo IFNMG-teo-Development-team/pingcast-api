@@ -7,8 +7,6 @@ import boto3
 import datetime
 import os
 
-
-
 try:
     s3 = boto3.resource('s3',
                         aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
@@ -40,7 +38,9 @@ except:
 
 # Instâncias para a aplicação, documentação e CORS
 app = Flask(__name__)
-api = Api(app, default_swagger_filename="PINGCAST", default="Pingcast-API", default_label="Rotas disponíveis")
+api = Api(app, title="PINGCAST-API", contact="audreytelesdossantos@gmail.com",
+          default_swagger_filename="PINGCAST", default="Pingcast-API", default_label="Rotas disponíveis")
+
 JWTManager(app)
 CORS(app)
 

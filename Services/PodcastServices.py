@@ -5,6 +5,7 @@ from Models.PerfilModel import Perfil
 from Models.CanalModel import Canal
 from Services.AWSServices import *
 from app import db
+from datetime import datetime
 
 # Campos para serialização dos dados
 resource_fields = {
@@ -62,25 +63,41 @@ def deletePodcast(id_podcast, id_perfil):
 
 def addPodcast(podcast, id_perfil, file):
     perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
+    canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
+    try:
+        novo_podcast = Podcast(nome=podcast['nome'], descricao=podcast['descricao'],
+                               duracao=podcast['duracao'],
+                               participantes=podcast['participantes'],
+                               data_postagem=datetime.today().strftime('%Y-%m-%d'),
+                               post_podcast=canal.id)
+        db.session.add(novo_podcast)
+        db.session.commit()
+        # filename = Path(f'{perfil.id}_{novo_podcast.id}.mp3')
+
+        # filename.write_bytes(file)
+        setFileBucket(file, perfil.id, novo_podcast.id)
+
+        return {"message": "Podcast was created successfully"}, 201
+    except:
+        return abort(500, "There was an error when creating the podcast")
+
+
+def editPodcast(id_podcast, id_perfil, pod):
+    perfil = Perfil.query.filter_by(id=id_perfil).first_or_404()
     if perfil:
         canal = Canal.query.filter_by(dono=id_perfil).first_or_404()
         if canal:
+            podcast = Podcast.query.filter_by(id=id_podcast, post_podcast=canal.id).first_or_404()
             try:
-                novo_podcast = Podcast(nome=podcast['nome'], descricao=podcast['descricao'],
-                                       duracao=podcast['duracao'],
-                                       participantes=podcast['participantes'],
-                                       data_postagem=podcast['data_postagem'],
-                                       post_podcast=canal.id)
-                db.session.add(novo_podcast)
+                podcast.participantes = pod['participantes']
+                podcast.nome = pod['nome']
+                podcast.descricao = pod['descricao']
+                db.session.add(podcast)
                 db.session.commit()
-                # filename = Path(f'{perfil.id}_{novo_podcast.id}.mp3')
 
-                # filename.write_bytes(file)
-                setFileBucket(file, perfil.id, novo_podcast.id)
-
-                return {"msg": "Podcast was created successfully"}, 201
+                return {"message": "Podcast was edited successfully"}, 200
             except:
-                return abort(500, "There was an error when creating the podcast")
+                return abort(500, "There was an error when editing the podcast")
 
     else:
         return abort(404, "Profile not found")
